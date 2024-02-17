@@ -23,13 +23,12 @@ jobs:
       chart_output: ${{ steps.check.outputs.chart_output }}
       result: ${{ steps.check.outputs.result }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 2
     - id: check
       run: |
         make check
-
   build:
     name: 'Build modified chart'
     runs-on: ubuntu-latest
@@ -40,7 +39,7 @@ jobs:
     - uses: gittools/actions/gitversion/setup@v0
       with:
         versionSpec: '5.x'
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - run: |
@@ -56,6 +55,21 @@ jobs:
         name: helm-artifact
         path: |
           *.tgz
+  helm:
+    name: 'Upload Helm chart'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v4
+    - run: ls
+
+  oci:
+    name: 'Upload OCI Helm chart'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v4
+    - run: ls
 
 
 
