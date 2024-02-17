@@ -1,0 +1,84 @@
+name: '[CI/CD] [Charts] Build & Push chart'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'charts/**'
+      - '!**.md'
+
+# env:
+#   registry: oci://git.juanah.com/charts/
+
+jobs:
+  modified:
+    name: 'Get modified charts'
+    runs-on: ubuntu-latest
+    outputs:
+      chart: ${{ steps.check.outputs.chart }}
+      chart_path: ${{ steps.check.outputs.chart_path }}
+      chart_output: ${{ steps.check.outputs.chart_output }}
+      result: ${{ steps.check.outputs.result }}
+    steps:
+    - uses: actions/checkout@v3
+    - id: check
+      run: |
+        make check
+
+  # build:
+  #   name: Helm build & push
+  #   runs-on: ubuntu-latest
+  #   needs: modified
+  #   container:
+  #     image: ganawa/runner:latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: azure/setup-helm@v3
+  #     - run: make helm
+  #       env:
+  #         CHART: ${{ needs.modified.outputs.chart }}
+  #         CHART_PATH: ${{ needs.modified.outputs.chart_path }}
+  #         CHART_VERSION: ${{ needs.modified.outputs.chart_version }}
+  #         # chart_output: ${{ needs.modified.outputs.chart_output }}
+  #         USER: ${{ env.GITHUB_ACTOR }}
+  #         PASS: ${{ secrets.USER_PAT  }}
+
+
+  #         # helm registry login git.juanah.com -u ${{ env.GITHUB_ACTOR }} -p ${{ secrets.USER_PAT  }}
+  #         # helm dependency build ${{ env.chart_path }}
+  #         # helm package ${{ env.chart_path }}
+  #         # helm push ${{ env.chart }}-${{ env.chart_version }}.tgz ${{ env.registry }}
+  #     # -
+  #     #   uses: docker/metadata-action@v4
+  #     #   id: metadata
+  #     #   with:
+  #     #     images: |
+  #     #       ${{ secrets.DOCKER_HUB_USERNAME }}/dns
+  #     #     tags: |
+  #     #       type=raw,value=latest,enable={{is_default_branch}}
+  #     #       type=semver,pattern={{version}},value=${{ env.SemVer }}
+  #     #     labels: |
+  #     #       org.opencontainers.image.description=CoreDNS Server
+  #     #       org.opencontainers.image.authors=Ganawa Juanah(ganawa@juanah.com)
+  #     #       org.opencontainers.image.url=github.com/ganawaj/zones
+  #     #       org.opencontainers.image.version=${{ env.SemVer }}
+  #     #       org.opencontainers.image.ref.name=${{ env. BranchName }}
+
+  #     # - uses: docker/setup-qemu-action@v2
+
+  #     # - uses: docker/setup-buildx-action@v2
+
+  #     # - uses: docker/login-action@v2
+  #     #   with:
+  #     #     username: ${{ secrets.DOCKER_HUB_USERNAME }}
+  #     #     password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+  #     # - uses: docker/build-push-action@v3
+  #     #   with:
+  #     #     context: .
+  #     #     file: build/docker/Dockerfile
+  #     #     push: ${{ github.event_name != 'pull_request' }}
+  #     #     tags: ${{ steps.metadata.outputs.tags }}
+  #     #     labels: ${{ steps.metadata.outputs.labels }}
