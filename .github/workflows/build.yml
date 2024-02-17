@@ -37,13 +37,15 @@ jobs:
     steps:
     - uses: actions/setup-python@v4
     - run: sudo apt-get install -y git-filter-repo
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - run: git-filter-repo --subdirectory-filter ${{ needs.modified.outputs.chart_path }}
     - uses: gittools/actions/gitversion/setup@v0
       with:
         versionSpec: '5.x'
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - run: |
+        git-filter-repo --subdirectory-filter ${{ needs.modified.outputs.chart_path }} &&
+        git remote add origin https://github.com/ganawaj/${{ needs.modified.outputs.chart}}-helm.git
     - uses: gittools/actions/gitversion/execute@v0
       id: gitversion
     - run: |
