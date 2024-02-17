@@ -4,49 +4,100 @@ metadata:
   name: {{ include "bazarr.fullname" . }}
   labels:
     {{- include "bazarr.labels" . | nindent 4 }}
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
-  replicas: {{ .Values.replicaCount }}
-  progressDeadlineSeconds: 600
-  revisionHistoryLimit: 10
+  replicas: {{ default 1 .Values.deployment.replicas }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  {{- with .Values.updateStrategy}}
+  strategy:
+    {{- toYaml . | nindent 4}}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "bazarr.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with .Values.deployment.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "bazarr.selectorLabels" . | nindent 8 }}
+        {{- with .Values.deployment.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.deployment.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "bazarr.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.deployment.initContainers }}
+      initContainers:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          dnsPolicy: {{ default "ClusterFirst" .Values.deployment.dnsPolicy}}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
-            - name: http
+            - name: bazarr
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          - name: PGID
+            value: "{{ .Values.user.gid | default "1001" }}"
+          - name: PUID
+            value: "{{ .Values.user.uid | default "1001"  }}"
+          - name: UMASK
+            value: "{{ .Values.user.umask | default "022"  }}"
+        {{- with .Values.deployment.additionalEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+          volumeMounts:
+          - name: config
+            mountPath: /config
+            {{- if and (.Values.config.persistence.subPath) (.Values.config.persistence.enabled) }}
+            subPath:
+            {{- end }}
+          - name: data
+            mountPath: /data
+            {{- if and (.Values.data.persistence.subPath) (.Values.config.persistence.enabled) }}
+            subPath:
+            {{- end }}
+        {{- with .Values.deployment.additionalVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.resources }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- end }}
+      volumes:
+      - name: config
+      {{- if .Values.config.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.config.persistence.existingClaim }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+      - name: data
+      {{- if .Values.data.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.data.persistence.existingClaim }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
