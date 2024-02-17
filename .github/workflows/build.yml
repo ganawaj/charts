@@ -13,6 +13,7 @@ on:
 #   registry: oci://git.juanah.com/charts/
 
 jobs:
+
   modified:
     name: 'Get modified charts'
     runs-on: ubuntu-latest
@@ -29,6 +30,29 @@ jobs:
       run: |
         make check
 
+  build:
+    name: 'Build modified chart'
+    runs-on: ubuntu-latest
+    needs: modified
+    steps:
+    - uses: actions/setup-python@v4
+    - run: sudo apt-get install -y git-filter-repo
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - run: git-filter-repo --subdirectory-filter ${{ needs.modified.outputs.chart_path }}
+    - run: ls
+
+
+
+
+
+
+
+
+
+  #   container:
+  #     image: ganawa/runner:latest
   # build:
   #   name: Helm build & push
   #   runs-on: ubuntu-latest
