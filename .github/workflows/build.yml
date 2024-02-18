@@ -76,9 +76,9 @@ jobs:
     - run: make helm
       env:
         CHART: "${{ needs.modified.outputs.chart}}-${{ needs.build.outputs.version }}.tgz"
-        USER: ${{ secrets.DOCKERHUB_USER }}
+        USER: ganawa
         PASS: ${{ secrets.DOCKERHUB_PASS }}
-        REGISTRY: "oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USER }}"
+        REGISTRY: "oci://registry-1.docker.io/ganawa"
 
 
   #       helm registry login https://registry-1.docker.io -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_PASS }} && \
