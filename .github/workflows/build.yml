@@ -69,17 +69,29 @@ jobs:
     - uses: actions/checkout@v4
       with:
         sparse-checkout: |
-          scripts/upload-helm.sh
+          scripts
+          Makefile
         sparse-checkout-cone-mode: false
     - uses: actions/download-artifact@v4
-    - run: |
-        ls && \
-        cd artifacts && \
-        ls && \
-        helm registry login https://registry-1.docker.io -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_PASS }} && \
-        helm push ${{ needs.modified.outputs.chart}}-${{ needs.build.outputs.version }}.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USER }}
+    - run: make helm
+      env:
+        CHART: "${{ needs.modified.outputs.chart}}-${{ needs.build.outputs.version }}.tgz"
+        USER: ${{ secrets.DOCKERHUB_USER }}
+        PASS: ${{ secrets.DOCKERHUB_PASS }}
+        REGISTRY: "oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USER }}"
 
-  # oci:
+
+  #       helm registry login https://registry-1.docker.io -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_PASS }} && \
+  #       CHART=${{ needs.modified.outputs.chart}}-${{ needs.build.outputs.version }}.tgz \
+
+
+  #       make helm
+  #       ls && \
+  #       cd artifacts && \
+  #       ls && \
+  #       helm push ${{ needs.modified.outputs.chart}}-${{ needs.build.outputs.version }}.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USER }}
+
+  # # oci:
   #   name: 'Upload OCI Helm chart to Github'
   #   needs: build
   #   runs-on: ubuntu-latest

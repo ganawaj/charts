@@ -15,7 +15,7 @@ check:
 
 .PHONY: helm
 helm:
-	@scripts/package-helm.sh
+	@scripts/upload-helm.sh
 
 .PHONY: oci
 oci:
