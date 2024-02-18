@@ -33,6 +33,8 @@ jobs:
     name: 'Build modified chart'
     runs-on: ubuntu-latest
     needs: modified
+    outputs:
+      version: ${{ steps.gitversion.outputs.semVer }}
     steps:
     - uses: actions/setup-python@v4
     - run: sudo apt-get install -y git-filter-repo
@@ -48,28 +50,34 @@ jobs:
     - uses: gittools/actions/gitversion/execute@v0
       id: gitversion
     - run: |
-        helm package .
+        helm package . --version ${{ steps.gitversion.outputs.semVer }}
     - name: Archive helm artifact
       uses: actions/upload-artifact@v4
       with:
-        name: helm-artifact
+        name: artifacts
         path: |
           *.tgz
-  helm:
-    name: 'Upload Helm chart'
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/download-artifact@v4
-    - run: ls
 
-  oci:
-    name: 'Upload OCI Helm chart'
-    needs: build
+  helm:
+    name: Upload OCI Helm chart to Dockerhub'
+    needs:
+    - build
+    - modified
     runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v4
-    - run: ls
+    - run: |
+        cd artifacts && \
+        helm registry login https://registry-1.docker.io -u ${{ github.actor }} -p ${{ secrets.DOCKERHUB_PASS }} && \
+        helm push ${{ needs.modified.outputs.chart}}-${{ needs.build.outputs.version }}.tgz
+
+  # oci:
+  #   name: 'Upload OCI Helm chart to Github'
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/download-artifact@v4
+  #   - run: ls
 
 
 
