@@ -14,7 +14,9 @@ helm registry login \
   -p $PASS \
   https://registry-1.docker.io
 
-until helm push $CHART $REGISTRY; do
-    echo "helm push failed retrying ..."
-    sleep 1
-done
+helm push $CHART $REGISTRY --debug
+
+# until helm push $CHART $REGISTRY; do
+#     echo "helm push failed retrying ..."
+#     sleep 1
+# done
