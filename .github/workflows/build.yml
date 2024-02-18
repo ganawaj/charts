@@ -69,7 +69,7 @@ jobs:
     - run: |
         cd artifacts && \
         helm registry login https://registry-1.docker.io -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_PASS }} && \
-        helm push ${{ needs.modified.outputs.chart}}-${{ needs.build.outputs.version }}.tgz
+        helm push ${{ needs.modified.outputs.chart}}-${{ needs.build.outputs.version }}.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USER }}
 
   # oci:
   #   name: 'Upload OCI Helm chart to Github'
