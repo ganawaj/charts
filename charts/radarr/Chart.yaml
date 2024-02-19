@@ -1,0 +1,14 @@
+apiVersion: v2
+name: radarr
+description: A Helm chart for Radarr.
+type: application
+version: 0.1.0
+appVersion: "release-5.3.6.8612"
+keywords:
+  - radarr
+sources:
+  - https://github.com/ganawaj/charts
+  - https://github.com/ganawaj/radarr-helm
+maintainers:
+  - name: Ganawa Juanah
+    email: ganawa@juanah.io

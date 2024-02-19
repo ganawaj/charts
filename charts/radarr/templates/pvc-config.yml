@@ -1,0 +1,29 @@
+{{- if and .Values.config.persistence.enabled (not .Values.config.persistence.existingClaim) -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "radarr.fullname" . }}-config
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "radarr.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - {{ .Values.config.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.config.persistence.size | quote }}
+  {{- if .Values.config.persistence.storageClass }}
+  {{- if (eq "-" .Values.config.persistence.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.config.persistence.storageClass | quote }}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.config.persistence.selector }}
+  selector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end -}}

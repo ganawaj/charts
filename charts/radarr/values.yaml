@@ -1,0 +1,229 @@
+image:
+  repository: ghcr.io/hotio/radarr
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+
+#
+# Configure radarr user and directory permissions
+#
+user:
+  uid: "1001"
+  gid: "1001"
+  umask: "022"
+
+#
+# Configure the deployment
+#
+deployment:
+  # -- Number of pods of the deployment
+  # -- NOTE: not HA ready and replicas > 1 will cause DB locking with
+  # -- default values.
+  replicas: 1
+  # -- Number of old history to retain to allow rollback (If not set, default Kubernetes value is set to 10)
+  revisionHistoryLimit: 10
+  # -- Additional deployment annotations
+  annotations: {}
+  # -- Additional deployment labels
+  labels: {}
+  # -- Additional pod annotations (e.g. for mesh injection or prometheus scraping)
+  podAnnotations: {}
+  # -- Additional Pod labels (e.g. for filtering Pod by custom labels)
+  podLabels: {}
+  # -- Additional containers (e.g. for metric offloading sidecars)
+  additionalContainers: []
+  # https://docs.datadoghq.com/developers/dogstatsd/unix_socket/?tab=host
+  # - name: socat-proxy
+  #   image: alpine/socat:1.0.5
+  #   args: ["-s", "-u", "udp-recv:8125", "unix-sendto:/socket/socket"]
+  #   volumeMounts:
+  #     - name: dsdsocket
+  #       mountPath: /socket
+  # -- Additional volume mounts available for use with initContainers and additionalContainers
+  additionalVolumeMounts: []
+  # - name: media
+  #   mountPath: /movies
+  #   subPath: movies
+  # - name: media
+  #   mountPath: /tv
+  #   subPath: tv
+  # -- Additional volumes available for use with initContainers and additionalContainers
+  additionalVolumes: []
+    # - name: media
+    #   persistentVolumeClaim:
+    #     claimName: radarr-media
+  # - name: dsdsocket
+  #   hostPath:
+  #     path: /var/run/statsd-exporter
+  # -- Additional env available for use with initContainers and additionalContainers
+  additionalEnv: []
+  # -- Additional initContainers (e.g. for setting file permission as shown below)
+  initContainers: []
+  # - name: volume-permissions
+  #   image: busybox:latest
+  #   command: ["sh", "-c", "touch /data/acme.json; chmod -v 600 /data/acme.json"]
+  #   securityContext:
+  #     runAsNonRoot: true
+  #     runAsGroup: 65532
+  #     runAsUser: 65532
+  #   volumeMounts:
+  #     - name: data
+  #       mountPath: /data
+  # dnsPolicy: ClusterFirstWithHostNet
+  imagePullSecrets: []
+
+
+#
+# Configure config persistence
+#
+config:
+  persistence:
+    enabled: false
+    # -- Existing claim to use
+    existingClaim: ""
+    # -- Existing claim's subPath to use, e.g. "media" (optional)
+    subPath: ""
+    # Persistent Volume Storage Class
+    # If defined, storageClassName: <storageClass>
+    # If set to "-", storageClassName: "", which disables dynamic provisioning
+    # If undefined (the default) or set to null, no storageClassName spec is
+    #   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    #   GKE, AWS & OpenStack)
+    storageClass: ""
+    ## Persistent Volume Selector
+    ## if enabled, define any Selectors for choosing existing Persistent Volumes here
+    # selector:
+    #   matchLabel:
+    #     netbox-storage: media
+    accessMode: ReadWriteOnce
+    ##
+    ## Persistant storage size request
+    size: 1Gi
+
+data:
+  persistence:
+    enabled: false
+    # -- Existing claim to use
+    existingClaim: ""
+    # -- Existing claim's subPath to use, e.g. "media" (optional)
+    subPath: ""
+    # Persistent Volume Storage Class
+    # If defined, storageClassName: <storageClass>
+    # If set to "-", storageClassName: "", which disables dynamic provisioning
+    # If undefined (the default) or set to null, no storageClassName spec is
+    #   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    #   GKE, AWS & OpenStack)
+    storageClass: ""
+    ## Persistent Volume Selector
+    ## if enabled, define any Selectors for choosing existing Persistent Volumes here
+    # selector:
+    #   matchLabel:
+    #     netbox-storage: media
+    accessMode: ReadWriteOnce
+    ##
+    ## Persistant storage size request
+    size: 1Gi
+
+
+# -- Customize updateStrategy: RollingUpdate or OnDelete
+updateStrategy:
+  type: Recreate
+  # rollingUpdate:
+  #   maxUnavailable: 0
+  #   maxSurge: 1
+
+livenessProbe:
+  failureThreshold: 8
+  httpGet:
+    path: /
+    port: radarr
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 15
+
+readinessProbe:
+  failureThreshold: 1
+  httpGet:
+    path: /
+    port: radarr
+    scheme: HTTP
+  initialDelaySeconds: 2
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 2
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+
+# -- Custom pod DNS policy. Apply if `hostNetwork: true`
+  # dnsPolicy: ClusterFirstWithHostNet
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# service:
+#   type: ClusterIP
+#   port: 80
+
+
+service:
+  annotations: {}
+  type: ClusterIP
+  port: 6767
+  nodePort: ""
+  clusterIP: ""
+  clusterIPs: []
+  externalIPs: []
+  externalTrafficPolicy: ""
+  ipFamilyPolicy: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  # - 10.0.0.0/8
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
