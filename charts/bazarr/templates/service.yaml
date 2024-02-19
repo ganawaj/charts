@@ -25,7 +25,6 @@ spec:
     {{- end }}
   selector:
     {{- include "bazarr.selectorLabels" . | nindent 4 }}
-    app.kubernetes.io/component: bazarr
   {{- if .Values.service.clusterIP }}
   clusterIP: {{ .Values.service.clusterIP | quote }}
   {{- end }}
