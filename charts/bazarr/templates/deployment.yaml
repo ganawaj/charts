@@ -76,10 +76,9 @@ spec:
             {{- if and (.Values.data.persistence.subPath) (.Values.config.persistence.enabled) }}
             subPath:
             {{- end }}
-          {{- .Values.deployment.additionalVolumeMounts | nindent 8 -}}
-        {{- with .Values.deployment.additionalVolumes }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+          {{- with .Values.deployment.additionalVolumeMounts }}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
         {{- if .Values.resources }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
@@ -99,9 +98,12 @@ spec:
         {{- else }}
         emptyDir: {}
         {{- end }}
+      {{- with .Values.deployment.additionalVolumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
+      {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
       affinity:

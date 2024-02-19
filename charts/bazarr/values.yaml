@@ -42,8 +42,17 @@ deployment:
   #       mountPath: /socket
   # -- Additional volume mounts available for use with initContainers and additionalContainers
   additionalVolumeMounts: []
+  # - name: media
+  #   mountPath: /movies
+  #   subPath: movies
+  # - name: media
+  #   mountPath: /tv
+  #   subPath: tv
   # -- Additional volumes available for use with initContainers and additionalContainers
   additionalVolumes: []
+    # - name: media
+    #   persistentVolumeClaim:
+    #     claimName: bazarr-media
   # - name: dsdsocket
   #   hostPath:
   #     path: /var/run/statsd-exporter
