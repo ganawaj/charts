@@ -38,11 +38,11 @@ spec:
       initContainers:
       {{- toYaml . | nindent 6 }}
       {{- end }}
+      dnsPolicy: {{.Values.deployment.dnsPolicy | default "ClusterFirst" }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          dnsPolicy: {{ default "ClusterFirst" .Values.deployment.dnsPolicy}}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
