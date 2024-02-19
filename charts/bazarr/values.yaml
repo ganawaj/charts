@@ -40,6 +40,8 @@ deployment:
   #   volumeMounts:
   #     - name: dsdsocket
   #       mountPath: /socket
+  # -- Additional volume mounts available for use with initContainers and additionalContainers
+  additionalVolumeMounts: []
   # -- Additional volumes available for use with initContainers and additionalContainers
   additionalVolumes: []
   # - name: dsdsocket

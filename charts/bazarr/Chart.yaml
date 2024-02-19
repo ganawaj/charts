@@ -3,10 +3,9 @@ name: bazarr
 description: A Helm chart for Bazarr.
 type: application
 version: 0.1.0
-appVersion: "1.16.0"
+appVersion: "release-1.4.1"
 keywords:
   - bazarr
-home: https://traefik.io/
 sources:
   - https://github.com/ganawaj/charts
   - https://github.com/ganawaj/bazarr-helm

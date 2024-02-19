@@ -76,6 +76,7 @@ spec:
             {{- if and (.Values.data.persistence.subPath) (.Values.config.persistence.enabled) }}
             subPath:
             {{- end }}
+          {{- .Values.deployment.additionalVolumeMounts | nindent 8 -}}
         {{- with .Values.deployment.additionalVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
