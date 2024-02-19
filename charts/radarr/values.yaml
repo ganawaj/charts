@@ -187,7 +187,7 @@ securityContext: {}
 service:
   annotations: {}
   type: ClusterIP
-  port: 6767
+  port: 7878
   nodePort: ""
   clusterIP: ""
   clusterIPs: []
