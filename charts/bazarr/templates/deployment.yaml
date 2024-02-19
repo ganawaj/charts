@@ -52,9 +52,9 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: bazarr
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
+          - name: bazarr
+            containerPort: {{ .Values.service.port }}
+            protocol: TCP
           env:
           - name: PGID
             value: "{{ .Values.user.gid | default "1001" }}"
@@ -77,7 +77,7 @@ spec:
             subPath:
             {{- end }}
           {{- with .Values.deployment.additionalVolumeMounts }}
-          {{- toYaml . | nindent 8 }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
         {{- if .Values.resources }}
         resources:
