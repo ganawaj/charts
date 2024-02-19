@@ -6,7 +6,7 @@ image:
 
 
 #
-# Configure radarr user and directory permissions
+# Configure sonarr user and directory permissions
 #
 user:
   uid: "1001"
@@ -52,7 +52,7 @@ deployment:
   additionalVolumes: []
     # - name: media
     #   persistentVolumeClaim:
-    #     claimName: radarr-media
+    #     claimName: sonarr-media
   # - name: dsdsocket
   #   hostPath:
   #     path: /var/run/statsd-exporter
@@ -137,7 +137,7 @@ livenessProbe:
   failureThreshold: 8
   httpGet:
     path: /
-    port: radarr
+    port: sonarr
     scheme: HTTP
   initialDelaySeconds: 10
   periodSeconds: 10
@@ -148,7 +148,7 @@ readinessProbe:
   failureThreshold: 1
   httpGet:
     path: /
-    port: radarr
+    port: sonarr
     scheme: HTTP
   initialDelaySeconds: 2
   periodSeconds: 10
