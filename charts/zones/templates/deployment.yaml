@@ -58,7 +58,8 @@ spec:
           {{- if .Values.coredns.config }}
           volumeMounts:
           - name: config-volume
-            mountPath: /etc/coredns
+            mountPath: /etc/coredns/Corefile
+            subPath: Corefile
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -67,9 +68,6 @@ spec:
         - name: config-volume
           configMap:
             name: {{ template "zones.fullname" . }}
-            items:
-            - key: Corefile
-              path: Corefile
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
