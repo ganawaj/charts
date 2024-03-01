@@ -10,7 +10,8 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-imagePullSecrets: []
+imagePullSecrets:
+  - name: regcred
 nameOverride: ""
 fullnameOverride: ""
 
@@ -97,7 +98,7 @@ securityContext: {}
 service:
   annotations: {}
   type: ClusterIP
-  port: 53
+  port: 80
   nodePort: ""
   clusterIP: ""
   clusterIPs: []
@@ -122,7 +123,6 @@ livenessProbe:
     path: /health
     port: 8080
     scheme: HTTP
-  enabled: true
   initialDelaySeconds: 60
   periodSeconds: 10
   timeoutSeconds: 5
@@ -131,10 +131,9 @@ livenessProbe:
 # To use the readinessProbe, the ready plugin needs to be enabled in CoreDNS' server config
 readinessProbe:
   httpGet:
-    path: /health
+    path: /ready
     port: 8181
     scheme: HTTP
-  enabled: true
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
