@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zones.name" . }}-doh
+  labels:
+    {{- include "zones.labels" . | nindent 4 }}
+  {{- if or .Values.commonAnnotations .Values.service.doh.annotations }}
+  annotations:
+    {{- with .Values.service.doh.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.doh.type }}
+  ports:
+    - port: {{ .Values.service.doh.port }}
+      targetPort: doh
+      protocol: TCP
+      name: doh
+  selector:
+    {{- include "zones.selectorLabels" . | nindent 4 }}
+  {{- if .Values.service.doh.clusterIP }}
+  clusterIP: {{ .Values.service.doh.clusterIP | quote }}
+  {{- end }}
+  {{- with .Values.service.doh.clusterIPs }}
+  clusterIPs:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.service.doh.externalIPs }}
+  externalIPs:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- if .Values.service.doh.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.service.doh.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if .Values.service.doh.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.service.doh.ipFamilyPolicy | quote }}
+  {{- end }}
+  {{- if .Values.service.doh.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.doh.loadBalancerIP | quote }}
+  {{- end }}
+  {{- with .Values.service.doh.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}

@@ -41,8 +41,14 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: dns
+              containerPort: {{ .Values.service.dns.port }}
+              protocol: UDP
+            - name: doh
+              containerPort: {{ .Values.service.doh.port }}
+              protocol: TCP
+            - name: dot
+              containerPort: {{ .Values.service.dot.port }}
               protocol: TCP
           {{- with .Values.additionalPorts }}
           {{- toYaml . | nindent 12 }}

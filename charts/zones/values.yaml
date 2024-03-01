@@ -27,7 +27,7 @@ coredns:
         health
     }
 
-    https://:443. {
+    https://:. {
         auto {
             directory /etc/coredns/zones (.*).db {1}
             reload 5s
@@ -117,26 +117,44 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  annotations: {}
-  type: ClusterIP
-  port: 80
-  nodePort: ""
-  clusterIP: ""
-  clusterIPs: []
-  externalIPs: []
-  externalTrafficPolicy: ""
-  ipFamilyPolicy: ""
-  loadBalancerIP: ""
-  loadBalancerSourceRanges: []
+  dns:
+    annotations: {}
+    type: ClusterIP
+    port: 53
+    nodePort: ""
+    clusterIP: ""
+    clusterIPs: []
+    externalIPs: []
+    externalTrafficPolicy: ""
+    ipFamilyPolicy: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+  doh:
+    annotations: {}
+    type: ClusterIP
+    port: 443
+    nodePort: ""
+    clusterIP: ""
+    clusterIPs: []
+    externalIPs: []
+    externalTrafficPolicy: ""
+    ipFamilyPolicy: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+  dot:
+    annotations: {}
+    type: ClusterIP
+    port: 853
+    nodePort: ""
+    clusterIP: ""
+    clusterIPs: []
+    externalIPs: []
+    externalTrafficPolicy: ""
+    ipFamilyPolicy: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
 
-# defaults to doh
-additionalPorts:
-  - name: dns
-    containerPort: 53
-    protocol: UDP
-  - name: dot
-    containerPort: 853
-    protocol: TCP
+additionalPorts: []
 
 # To use the livenessProbe, the health plugin needs to be enabled in CoreDNS' server config
 livenessProbe:

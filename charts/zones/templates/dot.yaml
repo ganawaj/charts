@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zones.name" . }}-dot
+  labels:
+    {{- include "zones.labels" . | nindent 4 }}
+  {{- if or .Values.commonAnnotations .Values.service.dot.annotations }}
+  annotations:
+    {{- with .Values.service.dot.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.dot.type }}
+  ports:
+    - port: {{ .Values.service.dot.port }}
+      targetPort: dot
+      protocol: TCP
+      name: dot
+  selector:
+    {{- include "zones.selectorLabels" . | nindent 4 }}
+  {{- if .Values.service.dot.clusterIP }}
+  clusterIP: {{ .Values.service.dot.clusterIP | quote }}
+  {{- end }}
+  {{- with .Values.service.dot.clusterIPs }}
+  clusterIPs:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.service.dot.externalIPs }}
+  externalIPs:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- if .Values.service.dot.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.service.dot.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if .Values.service.dot.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.service.dot.ipFamilyPolicy | quote }}
+  {{- end }}
+  {{- if .Values.service.dot.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.dot.loadBalancerIP | quote }}
+  {{- end }}
+  {{- with .Values.service.dot.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}

@@ -1,45 +1,45 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "zones.fullname" . }}
+  name: {{ include "zones.name" . }}
   labels:
     {{- include "zones.labels" . | nindent 4 }}
-  {{- if or .Values.commonAnnotations .Values.service.annotations }}
+  {{- if or .Values.commonAnnotations .Values.service.dns.annotations }}
   annotations:
-    {{- with .Values.service.annotations }}
+    {{- with .Values.service.dns.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
   {{- end }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.dns.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+    - port: {{ .Values.service.dns.port }}
+      targetPort: dns
+      protocol: UDP
+      name: dns
   selector:
     {{- include "zones.selectorLabels" . | nindent 4 }}
-  {{- if .Values.service.clusterIP }}
-  clusterIP: {{ .Values.service.clusterIP | quote }}
+  {{- if .Values.service.dns.clusterIP }}
+  clusterIP: {{ .Values.service.dns.clusterIP | quote }}
   {{- end }}
-  {{- with .Values.service.clusterIPs }}
+  {{- with .Values.service.dns.clusterIPs }}
   clusterIPs:
   {{- toYaml . | nindent 2 }}
   {{- end }}
-  {{- with .Values.service.externalIPs }}
+  {{- with .Values.service.dns.externalIPs }}
   externalIPs:
   {{- toYaml . | nindent 2 }}
   {{- end }}
-  {{- if .Values.service.externalTrafficPolicy }}
-  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy | quote }}
+  {{- if .Values.service.dns.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.service.dns.externalTrafficPolicy | quote }}
   {{- end }}
-  {{- if .Values.service.ipFamilyPolicy }}
-  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy | quote }}
+  {{- if .Values.service.dns.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.service.dns.ipFamilyPolicy | quote }}
   {{- end }}
-  {{- if .Values.service.loadBalancerIP }}
-  loadBalancerIP: {{ .Values.service.loadBalancerIP | quote }}
+  {{- if .Values.service.dns.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.dns.loadBalancerIP | quote }}
   {{- end }}
-  {{- with .Values.service.loadBalancerSourceRanges }}
+  {{- with .Values.service.dns.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
   {{- toYaml . | nindent 2 }}
   {{- end }}
