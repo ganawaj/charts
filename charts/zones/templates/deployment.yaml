@@ -55,14 +55,14 @@ spec:
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.coredns.config.enabled }}
+          {{- if .Values.coredns.config }}
           volumeMounts:
           - name: config-volume
             mountPath: /etc/coredns
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.coredns.config.enabled }}
+      {{- if .Values.coredns.config }}
       volumes:
         - name: config-volume
           configMap:

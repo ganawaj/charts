@@ -1,11 +1,11 @@
-{{- if not .Values.coredns.existingConfig.enabled }}
+{{- if .Values.coredns.config }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "dns.fullname" . }}
+  name: {{ template "zones.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  labels: {{- include "dns.labels" . | nindent 4 }}
+  labels: {{- include "zones.labels" . | nindent 4 }}
 data:
   Corefile: |-
     {{- .Values.coredns.config | nindent 4 -}}

@@ -10,10 +10,31 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-imagePullSecrets:
-  - name: regcred
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+coredns:
+  config: |
+    (defaults) {
+        reload 2s
+        log
+        debug
+        errors
+        any
+        cancel
+        ready
+        health
+    }
+
+    https://:443. {
+        auto {
+            directory /etc/coredns/zones (.*).db {1}
+            reload 5s
+        }
+        import defaults
+    }
+
 
 updateStrategy:
   rollingUpdate:
