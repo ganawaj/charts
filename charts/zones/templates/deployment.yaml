@@ -55,8 +55,22 @@ spec:
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.coredns.config.enabled }}
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/coredns
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.coredns.config.enabled }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ template "zones.fullname" . }}
+            items:
+            - key: Corefile
+              path: Corefile
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
