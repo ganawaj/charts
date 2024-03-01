@@ -1,0 +1,178 @@
+---
+# Source: dns/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: release-name-dns
+  labels:
+    helm.sh/chart: dns-0.1.0
+    app.kubernetes.io/name: dns
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: dns/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-dns
+  namespace: default
+  labels:
+    helm.sh/chart: dns-0.1.0
+    app.kubernetes.io/name: dns
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  Corefile: |-
+    (defaults) {
+      reload 2s
+      log
+      debug
+      errors
+      loop
+      any
+      cancel
+      ready
+    }
+    .:1053 {
+      cache
+      forward . tls://1.1.1.1 tls://1.0.0.1 {
+          tls_servername cloudflare-dns.com
+          health_check 60s
+      }
+      import defaults
+    }
+---
+# Source: dns/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-dns
+  labels:
+    helm.sh/chart: dns-0.1.0
+    app.kubernetes.io/name: dns
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 53
+      targetPort: dns
+      protocol: UDP
+      name: dns
+  selector:
+    app.kubernetes.io/name: dns
+    app.kubernetes.io/instance: release-name
+---
+# Source: dns/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-dns
+  labels:
+    helm.sh/chart: dns-0.1.0
+    app.kubernetes.io/name: dns
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dns
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      annotations:
+      labels:
+        app.kubernetes.io/name: dns
+        app.kubernetes.io/instance: release-name
+    spec:
+      serviceAccountName: release-name-dns
+      dnsPolicy: ClusterFirst
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: "coredns"
+          securityContext:
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+          image: "ganawa/coredns:1.16.0"
+          args: [ "-conf", "/etc/coredns/Corefile" ]
+          imagePullPolicy: IfNotPresent
+          ports:
+          - name: dns
+            containerPort: 53
+            protocol: UDP
+          - containerPort: 443
+            name: doh
+            protocol: TCP
+          livenessProbe:
+            enabled: true
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            enabled: true
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8181
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/coredns
+      volumes:
+        - name: config-volume
+          configMap:
+            name: release-name-dns
+            items:
+            - key: Corefile
+              path: Corefile
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+---
+# Source: dns/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "release-name-dns-test-connection"
+  labels:
+    helm.sh/chart: dns-0.1.0
+    app.kubernetes.io/name: dns
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['release-name-dns:53']
+  restartPolicy: Never
