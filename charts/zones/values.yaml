@@ -27,7 +27,7 @@ coredns:
         health
     }
 
-    https://:. {
+    https://. {
         auto {
             directory /etc/coredns/zones (.*).db {1}
             reload 5s
