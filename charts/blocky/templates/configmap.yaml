@@ -1,0 +1,20 @@
+{{- if .Values.blocky.config }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "blocky.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "blocky.labels" . | nindent 4 }}
+data:
+  config.yml: |-
+    {{- .Values.blocky.config | nindent 4 -}}
+  {{- if .Values.blocky.blacklist }}
+  blacklist.txt: |-
+    {{- .Values.blocky.blacklist | nindent 4 -}}
+  {{- end }}
+  {{- if .Values.blocky.whitelist }}
+  whitelist.txt: |-
+    {{- .Values.blocky.whitelist | nindent 4 -}}
+  {{- end }}
+{{- end }}
