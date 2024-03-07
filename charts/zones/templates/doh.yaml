@@ -1,3 +1,4 @@
+{{- if .Values.service.doh }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -43,3 +44,4 @@ spec:
   loadBalancerSourceRanges:
   {{- toYaml . | nindent 2 }}
   {{- end }}
+{{- end }}

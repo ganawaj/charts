@@ -45,12 +45,19 @@ spec:
             - name: dns
               containerPort: {{ .Values.service.dns.port }}
               protocol: UDP
+            - name: dns-tcp
+              containerPort: {{ .Values.service.dns.port }}
+              protocol: TCP
+            {{- if .Values.service.doh }}
             - name: doh
               containerPort: {{ .Values.service.doh.port }}
               protocol: TCP
+            {{- end }}
+            {{- if .Values.service.dot }}
             - name: dot
               containerPort: {{ .Values.service.dot.port }}
               protocol: TCP
+            {{- end }}
           {{- with .Values.additionalPorts }}
           {{- toYaml . | nindent 12 }}
           {{- end }}

@@ -17,6 +17,10 @@ spec:
       targetPort: dns
       protocol: UDP
       name: dns
+    - port: {{ .Values.service.dns.port }}
+      targetPort: dns-tcp
+      protocol: TCP
+      name: dns-tcp
   selector:
     {{- include "zones.selectorLabels" . | nindent 4 }}
   {{- if .Values.service.dns.clusterIP }}

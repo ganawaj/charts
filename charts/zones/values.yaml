@@ -129,30 +129,30 @@ service:
     ipFamilyPolicy: ""
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
-  doh:
-    annotations: {}
-    type: ClusterIP
-    port: 443
-    nodePort: ""
-    clusterIP: ""
-    clusterIPs: []
-    externalIPs: []
-    externalTrafficPolicy: ""
-    ipFamilyPolicy: ""
-    loadBalancerIP: ""
-    loadBalancerSourceRanges: []
-  dot:
-    annotations: {}
-    type: ClusterIP
-    port: 853
-    nodePort: ""
-    clusterIP: ""
-    clusterIPs: []
-    externalIPs: []
-    externalTrafficPolicy: ""
-    ipFamilyPolicy: ""
-    loadBalancerIP: ""
-    loadBalancerSourceRanges: []
+  # doh:
+  #   annotations: {}
+  #   type: ClusterIP
+  #   port: 443
+  #   nodePort: ""
+  #   clusterIP: ""
+  #   clusterIPs: []
+  #   externalIPs: []
+  #   externalTrafficPolicy: ""
+  #   ipFamilyPolicy: ""
+  #   loadBalancerIP: ""
+  #   loadBalancerSourceRanges: []
+  # dot:
+  #   annotations: {}
+  #   type: ClusterIP
+  #   port: 853
+  #   nodePort: ""
+  #   clusterIP: ""
+  #   clusterIPs: []
+  #   externalIPs: []
+  #   externalTrafficPolicy: ""
+  #   ipFamilyPolicy: ""
+  #   loadBalancerIP: ""
+  #   loadBalancerSourceRanges: []
 
 additionalPorts: []
 
